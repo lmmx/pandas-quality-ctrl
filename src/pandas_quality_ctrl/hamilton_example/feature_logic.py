@@ -8,12 +8,11 @@ against the output of the function. The default is to log a warning if validatio
 is specified. In which case, it will halt execution.
 
 Note:
-    (1) The functions written here scale to running on dask and ray. For spark see `feature_logic_spark.py`.
-    (2) Pandera only supports dataframes and series checks. Scalars outputs have to use the standard Hamilton validators.
-    (3) If you aren't familiar with Pandera we invite you to look at
+    (1) Pandera only supports dataframes and series checks. Scalars outputs have to use the standard Hamilton validators.
+    (2) If you aren't familiar with Pandera we invite you to look at
     https://pandera.readthedocs.io/en/stable/reference/generated/pandera.checks.Check.html# specifically the "Methods"
     section. That will show you what other checks Pandera comes with.
-    (4) If you require dataframe validation - see the examples here.
+    (3) If you require dataframe validation - see the examples here.
 
 """
 import numpy as np
@@ -87,7 +86,7 @@ seasons_encoded_schema = pa.DataFrameSchema(
 
 
 @check_output(schema=seasons_encoded_schema)
-@config.when_not_in(execution=["dask"])
+@config.when_in(execution=["normal"])
 def seasons_encoded__base(seasons: pd.Series) -> pd.DataFrame:
     """One hot encodes seasons into 4 dimensions:
     1 - first season
@@ -145,7 +144,7 @@ day_of_week_encoded_schema = pa.DataFrameSchema(
 
 
 @check_output(schema=day_of_week_encoded_schema)
-@config.when_not_in(execution=["dask"])
+@config.when_in(execution=["normal"])
 def day_of_week_encoded__base(day_of_the_week: pd.Series) -> pd.DataFrame:
     """One hot encodes day of week into five dimensions -- Saturday & Sunday weren't present.
     1 - Sunday, 2 - Monday, 3 - Tuesday, 4 - Wednesday, 5 - Thursday, 6 - Friday, 7 - Saturday.
