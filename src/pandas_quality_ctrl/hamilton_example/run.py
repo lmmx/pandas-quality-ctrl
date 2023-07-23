@@ -14,8 +14,6 @@ import logging
 import sys
 
 import data_loaders
-
-# we need to tell hamilton where to load function definitions from
 import feature_logic
 from hamilton.driver import Driver
 

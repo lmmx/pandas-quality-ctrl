@@ -57,14 +57,12 @@ def _sanitize_columns(df_columns: List[str]) -> List[str]:
 @extract_columns(*data_columns)
 @load_from.csv(path=source("location"), sep=value(";"))
 def raw_data__base(df: pd.DataFrame) -> pd.DataFrame:
-    """Extracts the raw data, renames the columns to be valid python variable names, and assigns an index.
+    """Extracts the raw data, renames the columns to be valid python variable names, and assigns an index
+    in the format "ID-Month-Day".
     :param location: the location to load from
     :return:
     """
-
-    # rename columns to be valid hamilton names -- and lower case it
     df.columns = _sanitize_columns(df.columns)
-    # create proper index -- ID-Month-Day;
     index = (
         df["id"].astype(str)
         + "-"
@@ -78,5 +76,6 @@ def raw_data__base(df: pd.DataFrame) -> pd.DataFrame:
 
 if __name__ == "__main__":
     # this is here as a quick way to check that things are working.
-    d = raw_data__base("Absenteeism_at_work.csv")
-    print(d.to_string())
+    csv_df = pd.read_csv("Absenteeism_at_work.csv", sep=";")
+    d = raw_data__base(df=csv_df)
+    print(d.head().to_string())
