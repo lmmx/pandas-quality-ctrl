@@ -19,7 +19,6 @@ Note:
 import numpy as np
 import pandas as pd
 import pandera as pa
-
 from hamilton.function_modifiers import check_output, config
 
 
@@ -70,17 +69,19 @@ age_zero_mean_unit_variance_schema = pa.SeriesSchema(
 
 
 @check_output(schema=age_zero_mean_unit_variance_schema)
-def age_zero_mean_unit_variance(age_zero_mean: pd.Series, age_std_dev: np.float64) -> pd.Series:
+def age_zero_mean_unit_variance(
+    age_zero_mean: pd.Series, age_std_dev: np.float64
+) -> pd.Series:
     """Zero mean unit variance value of age"""
     return age_zero_mean / age_std_dev
 
 
 seasons_encoded_schema = pa.DataFrameSchema(
     {
-        "seasons_1": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "seasons_2": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "seasons_3": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "seasons_4": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
+        "seasons_1": pa.Column(np.uint8, nullable=False),
+        "seasons_2": pa.Column(np.uint8, nullable=False),
+        "seasons_3": pa.Column(np.uint8, nullable=False),
+        "seasons_4": pa.Column(np.uint8, nullable=False),
     },
     strict=True,
 )
@@ -95,32 +96,10 @@ def seasons_encoded__base(seasons: pd.Series) -> pd.DataFrame:
     3 - third season
     4 - fourth season
     """
-    return pd.get_dummies(seasons, prefix="seasons")
+    return pd.get_dummies(seasons, prefix="seasons", dtype=np.uint8)
 
 
-@check_output(schema=seasons_encoded_schema)
-@config.when_in(execution=["dask"])
-def seasons_encoded__dask(seasons: pd.Series) -> pd.DataFrame:
-    """One hot encodes seasons into 4 dimensions:
-    1 - first season
-    2 - second season
-    3 - third season
-    4 - fourth season
-    """
-    import dask.dataframe as dd
-
-    categorized = seasons.astype(str).to_frame().categorize()
-    df = dd.get_dummies(categorized, prefix="seasons")
-    return df
-
-
-seasons_schema = pa.SeriesSchema(
-    np.uint8,
-    checks=[
-        pa.Check.isin([0, 1]),
-    ],
-    nullable=False,
-)
+seasons_schema = pa.SeriesSchema(np.uint8, nullable=False)
 
 
 @check_output(schema=seasons_schema)
@@ -149,11 +128,11 @@ def seasons_4(seasons_encoded: pd.DataFrame) -> pd.Series:
 
 day_of_week_encoded_schema = pa.DataFrameSchema(
     {
-        "day_of_the_week_2": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "day_of_the_week_3": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "day_of_the_week_4": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "day_of_the_week_5": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "day_of_the_week_6": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
+        "day_of_the_week_2": pa.Column(np.uint8, nullable=False),
+        "day_of_the_week_3": pa.Column(np.uint8, nullable=False),
+        "day_of_the_week_4": pa.Column(np.uint8, nullable=False),
+        "day_of_the_week_5": pa.Column(np.uint8, nullable=False),
+        "day_of_the_week_6": pa.Column(np.uint8, nullable=False),
     },
     strict=True,
 )
@@ -165,27 +144,12 @@ def day_of_week_encoded__base(day_of_the_week: pd.Series) -> pd.DataFrame:
     """One hot encodes day of week into five dimensions -- Saturday & Sunday weren't present.
     1 - Sunday, 2 - Monday, 3 - Tuesday, 4 - Wednesday, 5 - Thursday, 6 - Friday, 7 - Saturday.
     """
-    return pd.get_dummies(day_of_the_week, prefix="day_of_the_week")
-
-
-@check_output(schema=day_of_week_encoded_schema)
-@config.when_in(execution=["dask"])
-def day_of_week_encoded__dask(day_of_the_week: pd.Series) -> pd.DataFrame:
-    """One hot encodes day of week into five dimensions -- Saturday & Sunday weren't present.
-    1 - Sunday, 2 - Monday, 3 - Tuesday, 4 - Wednesday, 5 - Thursday, 6 - Friday, 7 - Saturday.
-    """
-    import dask.dataframe as dd
-
-    categorized = day_of_the_week.astype(str).to_frame().categorize()
-    df = dd.get_dummies(categorized, prefix="day_of_the_week")
+    df = pd.get_dummies(day_of_the_week, prefix="day_of_the_week", dtype=np.uint8)
     return df
 
 
 day_of_week_schema = pa.SeriesSchema(
     np.uint8,
-    checks=[
-        pa.Check.isin([0, 1]),
-    ],
     nullable=False,
 )
 
