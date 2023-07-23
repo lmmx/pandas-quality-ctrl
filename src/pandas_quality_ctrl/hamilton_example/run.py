@@ -17,14 +17,14 @@ import data_loaders
 
 # we need to tell hamilton where to load function definitions from
 import feature_logic
-
-from hamilton import driver
+from hamilton.driver import Driver
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout)
     # passing in execution to help set up the right nodes for the DAG
     config = {"location": "Absenteeism_at_work.csv", "execution": "normal"}
-    dr = driver.Driver(config, data_loaders, feature_logic)  # can pass in multiple modules
+    modules = data_loaders, feature_logic
+    dr = Driver(config, *modules)
     # we need to specify what we want in the final dataframe.
     output_columns = [
         "age",
@@ -43,10 +43,7 @@ if __name__ == "__main__":
         "seasons_4",
         "absenteeism_time_in_hours",
     ]
-    # To visualize do `pip install "sf-hamilton[visualization]"` if you want these to work
     # dr.visualize_execution(output_columns, './run', {"format": "png"})
     # dr.display_all_functions('./my_full_dag.dot')
-
-    # let's create the dataframe!
-    df = dr.execute(output_columns)
+    df = dr.execute(final_vars=output_columns)
     print(df.head().to_string())
