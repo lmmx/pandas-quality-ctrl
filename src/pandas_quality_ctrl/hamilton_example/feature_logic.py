@@ -15,10 +15,10 @@ Note:
     (3) If you require dataframe validation - see the examples here.
 
 """
+
 import numpy as np
 import pandas as pd
 import pandera as pa
-
 from hamilton.function_modifiers import check_output, config
 
 
@@ -69,17 +69,27 @@ age_zero_mean_unit_variance_schema = pa.SeriesSchema(
 
 
 @check_output(schema=age_zero_mean_unit_variance_schema)
-def age_zero_mean_unit_variance(age_zero_mean: pd.Series, age_std_dev: np.float64) -> pd.Series:
+def age_zero_mean_unit_variance(
+    age_zero_mean: pd.Series, age_std_dev: np.float64
+) -> pd.Series:
     """Zero mean unit variance value of age"""
     return age_zero_mean / age_std_dev
 
 
 seasons_encoded_schema = pa.DataFrameSchema(
     {
-        "seasons_1": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "seasons_2": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "seasons_3": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "seasons_4": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
+        "seasons_1": pa.Column(
+            np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False
+        ),
+        "seasons_2": pa.Column(
+            np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False
+        ),
+        "seasons_3": pa.Column(
+            np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False
+        ),
+        "seasons_4": pa.Column(
+            np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False
+        ),
     },
     strict=True,
 )
@@ -95,7 +105,6 @@ def seasons_encoded__base(seasons: pd.Series) -> pd.DataFrame:
     4 - fourth season
     """
     return pd.get_dummies(seasons, prefix="seasons", dtype=np.uint8)
-
 
 
 seasons_schema = pa.SeriesSchema(
@@ -133,11 +142,21 @@ def seasons_4(seasons_encoded: pd.DataFrame) -> pd.Series:
 
 day_of_week_encoded_schema = pa.DataFrameSchema(
     {
-        "day_of_the_week_2": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "day_of_the_week_3": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "day_of_the_week_4": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "day_of_the_week_5": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
-        "day_of_the_week_6": pa.Column(np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False),
+        "day_of_the_week_2": pa.Column(
+            np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False
+        ),
+        "day_of_the_week_3": pa.Column(
+            np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False
+        ),
+        "day_of_the_week_4": pa.Column(
+            np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False
+        ),
+        "day_of_the_week_5": pa.Column(
+            np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False
+        ),
+        "day_of_the_week_6": pa.Column(
+            np.uint8, checks=[pa.Check.isin([0, 1])], nullable=False
+        ),
     },
     strict=True,
 )
@@ -150,6 +169,7 @@ def day_of_week_encoded__base(day_of_the_week: pd.Series) -> pd.DataFrame:
     1 - Sunday, 2 - Monday, 3 - Tuesday, 4 - Wednesday, 5 - Thursday, 6 - Friday, 7 - Saturday.
     """
     return pd.get_dummies(day_of_the_week, prefix="day_of_the_week", dtype=np.uint8)
+
 
 day_of_week_schema = pa.SeriesSchema(
     np.uint8,
